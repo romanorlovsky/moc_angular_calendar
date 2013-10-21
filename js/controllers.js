@@ -23,7 +23,7 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         angular.forEach(data.days, function (value) {
 
-            classes.push('moc-calendar-' + value.title);
+            classes.push('moc-calendar-' + (value.id + 'item'));
             options.push({id: value.id, title: value.title, color: value.color});
 
         });
@@ -147,8 +147,6 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
         }, function (error) {
 
         });
-
-        return $scope.types[item].title;
 
     };
 

@@ -125,7 +125,7 @@ app.directive('datePicker',function () {
                         '</div>' +
                         '<span class=""> - {{types.' + itemName + '.title}}</span>' +
                         '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title" required>' +
-                        '<button ng-click="updateDateType(\'' + itemName + '\')" ng-disabled="moc_days_form_' + itemName + '.$pristine">Update</button>' +
+                        '<button update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Update</button>' +
                         '<button cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button></form></li>';
                 });
 
@@ -220,7 +220,7 @@ app.directive('datePicker',function () {
                 })(jQuery);
             }
         };
-    }).directive('cancelDateType', function (DIRTY_CLASS, PRISTINE_CLASS) {
+    }).directive('cancelDateType',function (DIRTY_CLASS, PRISTINE_CLASS) {
         return {
             link: function (scope, element, attr) {
 
@@ -236,6 +236,26 @@ app.directive('datePicker',function () {
                         picker.ColorPickerSetColor(color).find('div').css('background-color', '#' + color);
 
                         scope.resetTypeForm(attr.cancelDateType, editTitle.data('title'), false);
+
+                    });
+
+                })(jQuery);
+            }
+        };
+    }).directive('updateDateType', function (DIRTY_CLASS, PRISTINE_CLASS) {
+        return {
+            link: function (scope, element, attr) {
+
+                (function ($) {
+
+                    $(element).on('click', function () {
+
+                        var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
+
+                        parent.find('div.moc-colorpicker-block').data('color', scope.types[attr.updateDateType].color);
+                        $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS).data('title', scope.types[attr.updateDateType].title);
+
+                        scope.updateDateType(attr.updateDateType);
 
                     });
 
