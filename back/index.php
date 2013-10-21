@@ -20,13 +20,13 @@ try {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+$url = substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['SCRIPT_NAME'], '/') + 1);
+
 switch ($method) {
     case 'GET':
         if (isset($_GET['term']))
             getUserById($connection);
         else {
-            $url = substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['SCRIPT_NAME'], '/') + 1);
-
             list($action, $id, $year) = explode('/', $url, 3);
 
             switch ($action) {
@@ -39,6 +39,19 @@ switch ($method) {
                     getDays($connection);
                     break;
             }
+        }
+        break;
+    case 'POST':
+        $action = $url;
+        switch ($action) {
+
+            case 'updateudays':
+                getUserDays($connection, $id, $year);
+                break;
+
+            case 'updatedays':
+                updateDays($connection);
+                break;
         }
         break;
 }
@@ -107,4 +120,17 @@ function getDays($connection) {
     }
 
     echo json_encode(array('days' => $json));
+}
+
+function updateDays($connection) {
+    $params = json_decode(trim(file_get_contents('php://input')), true);
+
+    $query = "UPDATE days SET title = :title, color = :color WHERE id = :id";
+    $stmt = $connection->prepare($query);
+    $stmt->bindParam(':id', $params['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':title', $params['title'], PDO::PARAM_STR);
+    $stmt->bindParam(':color', $params['color'], PDO::PARAM_STR);
+    $result = $stmt->execute();
+
+    echo json_encode(array('result' => $result));
 }

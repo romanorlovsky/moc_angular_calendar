@@ -3,7 +3,7 @@
 app.factory('UserDays',function ($resource) {
     return $resource('/back/:action/:id/:year', {id: '@id', year: '@year'}, {
         create: {method: 'PUT'},
-        save: {method: 'POST'},
+        save: {method: 'POST', params: {action: 'updateudays'}, responseType: 'json'},
         get: {method: 'GET', params: {action: 'udays'}, responseType: 'json'}
     });
 }).factory('Days',function ($resource) {

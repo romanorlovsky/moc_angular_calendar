@@ -106,19 +106,27 @@ app.directive('datePicker',function () {
 
                 var list = '<label for="moc-days-list">Day type: </label><select id="moc-days-list" ng-model="model.date_type" dropdown-toggle="">',
                     style = '<style type="text/css" id="moc-style">',
-                    block = '<ul id="moc-days-block">';//<a id="moc-days-block-toggle" data-show="">Show</a>
-1
+                    block = '<ul id="moc-days-block">',//<a id="moc-days-block-toggle" data-show="">Show</a>
+                    itemName = '';
+
+                scope.types = {};
+
                 angular.forEach(newValue.options, function (value) {
+
+                    itemName = value.id + 'item';
+
+                    scope.types[itemName] = {id: value.id, title: value.title, color: value.color};
+
                     list += '<option value="' + value.id + '">' + value.title + '</option>';
-                    style += appClassTemplate(value.title, value.color, false);
-                    block += '<li><form name="moc_days_form_' + value.title + '" id="moc_days_form_' + value.title + '" class="moc_days_forms" ng-init="types.' + value.title + '.title=\'' + value.title + '\'; types.' + value.title + '.color=\'' + value.color + '\';">' +
-                        '<div id="moc-colorpicker-' + value.title + '" class="moc-colorpicker-block" data-color="' + value.color + '" data-item="' + value.id + '">' +
-                        '<div edit-date-type="" name="' + value.title + 'Item" ng-model="types.' + value.title + '.color" style="background-color: #' + value.color + ';"></div>' +
+                    style += appClassTemplate(itemName, value.color, false);
+                    block += '<li><form name="moc_days_form_' + itemName + '" id="moc_days_form_' + itemName + '" class="moc_days_forms">' +
+                        '<div id="moc-colorpicker-' + itemName + '" class="moc-colorpicker-block" data-color="' + value.color + '" data-item="' + value.id + '">' +
+                        '<div edit-date-type="" name="' + itemName + '_color" ng-model="types.' + itemName + '.color" style="background-color: #' + value.color + ';"></div>' +
                         '</div>' +
-                        '<span class=""> - ' + value.title + '</span>' +
-                        '<input type="text" value="' + value.title + '" ng-model="types.' + value.title + '.title" required>' +
-                        '<button update-date-type="" ng-model="types.' + value.title + '" ng-disabled="moc_days_form_' + value.title + '.$pristine">Update</button>' +
-                        '<button cancel-date-type="' + value.title + '" ng-model="types.' + value.title + '" ng-disabled="moc_days_form_' + value.title + '.$pristine">Cancel</button></form></li>';
+                        '<span class=""> - {{types.' + itemName + '.title}}</span>' +
+                        '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title" required>' +
+                        '<button ng-click="updateDateType(\'' + itemName + '\')" ng-disabled="moc_days_form_' + itemName + '.$pristine">Update</button>' +
+                        '<button cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button></form></li>';
                 });
 
                 list += '</select>';
@@ -212,7 +220,7 @@ app.directive('datePicker',function () {
                 })(jQuery);
             }
         };
-    }).directive('cancelDateType',function () {
+    }).directive('cancelDateType', function (DIRTY_CLASS, PRISTINE_CLASS) {
         return {
             link: function (scope, element, attr) {
 
@@ -220,30 +228,14 @@ app.directive('datePicker',function () {
 
                     $(element).on('click', function () {
 
-                        var parent = $(element).closest('.moc_days_forms').removeClass('ng-dirty').addClass('ng-pristine'),
+                        var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS),
                             picker = parent.find('div.moc-colorpicker-block'),
-                            color = picker.data('color');
-
-                        scope.resetForm(attr.cancelDateType);
+                            color = picker.data('color'),
+                            editTitle = $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
 
                         picker.ColorPickerSetColor(color).find('div').css('background-color', '#' + color);
 
-                    });
-
-                })(jQuery);
-            }
-        };
-    }).directive('updateDateType', function () {
-        return {
-            restrict: 'A',
-            require: '?ngModel',
-            link: function (scope, element, attr, ngModel) {
-
-                (function ($) {
-
-                    $(element).on('click', function () {
-
-                        console.log(ngModel);
+                        scope.resetTypeForm(attr.cancelDateType, editTitle.data('title'), false);
 
                     });
 

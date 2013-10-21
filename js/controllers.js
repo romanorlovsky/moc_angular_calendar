@@ -108,19 +108,48 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
     };
 
-    $scope.resetFormItem = function (item) {
+    $scope.resetFormItem = function (item, inController) {
 
-        $scope.$apply(function () {
+        if (inController) {
 
             item.$dirty = false;
             item.$pristine = true;
 
-        });
+        } else {
+
+            $scope.$apply(function () {
+
+                item.$dirty = false;
+                item.$pristine = true;
+
+            });
+
+        }
     };
 
-    $scope.resetForm = function (item) {
-        $scope.resetFormItem($scope['moc_days_form_' + item]);
-        $scope.resetFormItem($scope['moc_days_form_' + item][item + 'Item']);
+    $scope.resetTypeForm = function (item, editVal, inController) {
+
+        $scope.resetFormItem($scope['moc_days_form_' + item], inController);
+        $scope.resetFormItem($scope['moc_days_form_' + item][item + '_color'], inController);
+
+        if (editVal) $scope.types[item].title = editVal;
+
+        $scope.resetFormItem($scope['moc_days_form_' + item][item + '_title'], inController);
+
+    };
+
+    $scope.updateDateType = function (item) {
+
+        Days.save($scope.types[item], function (success) {
+
+            $scope.resetTypeForm(item, false, true);
+
+        }, function (error) {
+
+        });
+
+        return $scope.types[item].title;
+
     };
 
 });
