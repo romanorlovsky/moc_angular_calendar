@@ -35,6 +35,12 @@ app.directive('datePicker',function () {
                     stepMonths: 12,
                     onChangeMonthYear: function (year, month, inst) {
 
+                        if (scope.model.add_date && !confirm('All unsaved data will be lost. Continue?')) {
+                            inst.selectedYear = curYear;
+                            inst.drawYear = curYear;
+                            return;
+                        }
+
                         scope.updateYear(year, false);
 
                     },
@@ -117,7 +123,7 @@ app.directive('datePicker',function () {
 
                     scope.types[itemName] = {id: value.id, title: value.title, color: value.color};
 
-                    list += '<option value="' + value.id + '">' + value.title + '</option>';
+                    list += '<option value="' + value.id + '">{{types.' + itemName + '.title}}</option>';
                     style += appClassTemplate(itemName, value.color, false);
                     block += '<li><form name="moc_days_form_' + itemName + '" id="moc_days_form_' + itemName + '" class="moc_days_forms">' +
                         '<div id="moc-colorpicker-' + itemName + '" class="moc-colorpicker-block" data-color="' + value.color + '" data-item="' + value.id + '">' +
@@ -125,8 +131,8 @@ app.directive('datePicker',function () {
                         '</div>' +
                         '<span class=""> - {{types.' + itemName + '.title}}</span>' +
                         '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title" required>' +
-                        '<button update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Update</button>' +
-                        '<button cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button></form></li>';
+                        '<input type="button" update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine" value="Save">' +
+                        '<input type="button" cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine" value="Cancel"></form></li>';
                 });
 
                 list += '</select>';
@@ -221,45 +227,41 @@ app.directive('datePicker',function () {
             }
         };
     }).directive('cancelDateType',function (DIRTY_CLASS, PRISTINE_CLASS) {
-        return {
-            link: function (scope, element, attr) {
+        return function (scope, element, attr) {
 
-                (function ($) {
+            (function ($) {
 
-                    $(element).on('click', function () {
+                $(element).on('click', function () {
 
-                        var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS),
-                            picker = parent.find('div.moc-colorpicker-block'),
-                            color = picker.data('color'),
-                            editTitle = $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
+                    var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS),
+                        picker = parent.find('div.moc-colorpicker-block'),
+                        color = picker.data('color'),
+                        editTitle = $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
 
-                        picker.ColorPickerSetColor(color).find('div').css('background-color', '#' + color);
+                    picker.ColorPickerSetColor(color).find('div').css('background-color', '#' + color);
 
-                        scope.resetTypeForm(attr.cancelDateType, editTitle.data('title'), false);
+                    scope.resetTypeForm(attr.cancelDateType, editTitle.data('title'), false);
 
-                    });
+                });
 
-                })(jQuery);
-            }
+            })(jQuery);
         };
     }).directive('updateDateType', function (DIRTY_CLASS, PRISTINE_CLASS) {
-        return {
-            link: function (scope, element, attr) {
+        return function (scope, element, attr) {
 
-                (function ($) {
+            (function ($) {
 
-                    $(element).on('click', function () {
+                $(element).on('click', function () {
 
-                        var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
+                    var parent = $(element).closest('.moc_days_forms').removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS);
 
-                        parent.find('div.moc-colorpicker-block').data('color', scope.types[attr.updateDateType].color);
-                        $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS).data('title', scope.types[attr.updateDateType].title);
+                    parent.find('div.moc-colorpicker-block').data('color', scope.types[attr.updateDateType].color);
+                    $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS).data('title', scope.types[attr.updateDateType].title);
 
-                        scope.updateDateType(attr.updateDateType);
+                    scope.saveDateType(attr.updateDateType);
 
-                    });
+                });
 
-                })(jQuery);
-            }
+            })(jQuery);
         };
     });

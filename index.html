@@ -22,14 +22,12 @@
 
 <input type="text" value="" ng-model="model.user" auto-complete="">
 
-<div>|{{model.user_id}}|</div>
-
 <div date-select=""></div>
 
-<div>|{{model.date_type}}|</div>
-<div>|{{model.year}}|</div>
-
+<form><input type="button" ng-disabled="!model.add_date" ng-click="saveUserDate()" value="Save"></form>
 <div ng-model="model.days" date-picker=""></div>
+
+<div class="overlay" ng-show="model.loading">Loading...</div>
 
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/services.js"></script>

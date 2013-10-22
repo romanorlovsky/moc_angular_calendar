@@ -1,10 +1,10 @@
 'use strict';
 
 app.factory('UserDays',function ($resource) {
-    return $resource('/back/:action/:id/:year', {id: '@id', year: '@year'}, {
+    return $resource('/back/:action/:id/:year', {}, {
         create: {method: 'PUT'},
         save: {method: 'POST', params: {action: 'updateudays'}, responseType: 'json'},
-        get: {method: 'GET', params: {action: 'udays'}, responseType: 'json'}
+        get: {method: 'GET', params: {id: '@id', year: '@year', action: 'udays'}, responseType: 'json'}
     });
 }).factory('Days',function ($resource) {
         return $resource('/back/:action', {}, {

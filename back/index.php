@@ -46,7 +46,7 @@ switch ($method) {
         switch ($action) {
 
             case 'updateudays':
-                getUserDays($connection, $id, $year);
+                updateUserDays($connection);
                 break;
 
             case 'updatedays':
@@ -123,14 +123,35 @@ function getDays($connection) {
 }
 
 function updateDays($connection) {
-    $params = json_decode(trim(file_get_contents('php://input')), true);
+    try {
+        $params = json_decode(trim(file_get_contents('php://input')), true);
 
-    $query = "UPDATE days SET title = :title, color = :color WHERE id = :id";
-    $stmt = $connection->prepare($query);
-    $stmt->bindParam(':id', $params['id'], PDO::PARAM_INT);
-    $stmt->bindParam(':title', $params['title'], PDO::PARAM_STR);
-    $stmt->bindParam(':color', $params['color'], PDO::PARAM_STR);
-    $result = $stmt->execute();
+        $query = "UPDATE days SET title = :title, color = :color WHERE id = :id";
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(':id', $params['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':title', $params['title'], PDO::PARAM_STR);
+        $stmt->bindParam(':color', $params['color'], PDO::PARAM_STR);
+        $result = $stmt->execute();
 
-    echo json_encode(array('result' => $result));
+        echo json_encode(array('result' => $result));
+    } catch (Exception $ex) {
+        echo json_encode(array('result' => $ex));
+    }
+}
+
+function updateUserDays($connection) {
+    try {
+        $params = json_decode(trim(file_get_contents('php://input')), true);
+
+        $query = "UPDATE calendar SET days = :days WHERE user_id = :user_id AND year = :year";
+        $stmt = $connection->prepare($query);
+        $stmt->bindParam(':user_id', $params['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':year', $params['year'], PDO::PARAM_INT);
+        $stmt->bindParam(':days', serialize($params['days']), PDO::PARAM_STR);
+        $result = $stmt->execute();
+
+        echo json_encode(array('result' => $result));
+    } catch (Exception $ex) {
+        echo json_encode(array('result' => $ex));
+    }
 }
