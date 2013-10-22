@@ -110,7 +110,7 @@ app.directive('datePicker',function () {
                 if (!newValue.classes) return;
                 if (oldValue.classes) return;
 
-                var list = '<label for="moc-days-list">Day type: </label><select id="moc-days-list" ng-model="model.date_type" dropdown-toggle="">',
+                var list = '<label for="moc-days-list">Reason: </label><select id="moc-days-list" ng-model="model.date_type" dropdown-toggle="">',
                     style = '<style type="text/css" id="moc-style">',
                     block = '<ul id="moc-days-block">',//<a id="moc-days-block-toggle" data-show="">Show</a>
                     itemName = '';

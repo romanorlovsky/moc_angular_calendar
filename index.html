@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="calendar">
 <head>
-    <title>Calendar</title>
+    <title>Personal Exceptional Dates</title>
     <!--<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.custom.css">-->
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -20,7 +20,8 @@
 </head>
 <body ng-controller="calendarCtrl">
 
-<input type="text" value="" ng-model="model.user" auto-complete="">
+<label for="moc-user">User:</label>
+<input id="moc-user" type="text" value="" ng-model="model.user" auto-complete="">
 
 <div date-select=""></div>
 
