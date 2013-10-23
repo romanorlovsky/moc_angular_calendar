@@ -110,3 +110,31 @@ function appDateBlockTemplate(options) {
 
     return {html: list + block, style: style};
 }
+
+function parseResponseData(data) {
+
+    var result = [];
+
+    if (data.length > 0) {
+
+        angular.forEach(data, function (value) {
+            this[value.day] = value.type;
+        }, result);
+
+    }
+
+    return result;
+}
+
+function genSendData(data) {
+    var result = [];
+
+    if (data.length > 0) {
+
+        for (var item in data) {
+            result.push({day: item, type: data[item]});
+        }
+    }
+
+    return result;
+}

@@ -11,8 +11,12 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
         date_data: {},
         year: null,
         loading: true,
-        add_date: false
+        add_date: false,
+        empty_date: false,
+        success: null
     };
+
+    $scope.alert = [];
 
     /*var cacheData = DataCache.get('date_data');
 
@@ -77,7 +81,14 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
                 });
             }
 
-            $scope.model.date.push({day: date, type: Number($scope.model.date_type)});
+            var current = $scope.model.date[date];
+
+            if(current && !($scope.model.date_type != current)) {
+                delete $scope.model.date[date];
+            }
+            else {
+                $scope.model.date[date] = Number($scope.model.date_type);
+            }
 
         }
 
@@ -108,6 +119,7 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
     };
 
+
     $scope.getUserDays = function (id, updateYear) {
 
         $scope.model.loading = true;
@@ -124,7 +136,13 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         UserDays.get({id: $scope.model.user_id, year: $scope.model.year}, function (data) {
 
-            $scope.model.date = (data.days) ? data.days : [];
+            if (data.days) {
+                $scope.model.date = parseResponseData(data.days);
+                $scope.model.empty_date = false;
+            } else {
+                $scope.model.date = [];
+                $scope.model.empty_date = true;
+            }
 
             $scope.model.loading = false;
 
@@ -168,14 +186,14 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         $scope.model.loading = true;
 
-        Days.save($scope.types[item], function () {
+        Days.save($scope.types[item], function (success) {
 
             $scope.resetTypeForm(item, false, true);
 
-            $scope.model.loading = false;
+            $scope.getResponse(success);
 
-        }, function () {
-            $scope.model.loading = false;
+        }, function (error) {
+            $scope.getResponse(error);
         });
 
     };
@@ -186,19 +204,51 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         $scope.model.loading = true;
 
-        UserDays.save({
+        var data = {
             id: $scope.model.user_id,
-            days: $scope.model.date,
+            days: genSendData($scope.model.date),
             year: (($scope.model.year) ? $scope.model.year : (new Date()).getFullYear())
-        }, function () {
+        };
 
-            $scope.model.loading = false;
-            $scope.model.add_date = false;
+        if (!$scope.model.empty_date) {
 
-        }, function () {
+            UserDays.save(data, function (success) {
+
+                $scope.getResponse(success);
+
+            }, function (error) {
+                $scope.getResponse(error);
+            });
+
+        } else {
+
+            UserDays.create(data, function (success) {
+
+                $scope.getResponse(success);
+
+            }, function (error) {
+                $scope.getResponse(error);
+            });
+
+        }
+
+    };
+
+    $scope.startLoading = function () {
+        $scope.$apply(function () {
+            $scope.model.loading = true;
+        });
+    };
+
+    $scope.endLoading = function () {
+        $scope.$apply(function () {
             $scope.model.loading = false;
         });
+    };
 
+    $scope.getResponse = function (response) {
+        $scope.model.loading = false;
+        $scope.model.add_date = !($scope.model.success = (response.result == true));
     };
 
 });

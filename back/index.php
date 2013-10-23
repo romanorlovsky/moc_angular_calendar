@@ -54,6 +54,19 @@ switch ($method) {
                 break;
         }
         break;
+    case 'PUT':
+        $action = $url;
+        switch ($action) {
+
+            case 'updateudays':
+                createUserDays($connection);
+                break;
+
+            case 'updatedays':
+                updateDays($connection);
+                break;
+        }
+        break;
 }
 
 function getUserById($connection) {
@@ -139,9 +152,10 @@ function updateDays($connection) {
     }
 }
 
-function updateUserDays($connection) {
+function updateUserDays($connection, $params = false) {
     try {
-        $params = json_decode(trim(file_get_contents('php://input')), true);
+        if (!$params)
+            $params = json_decode(trim(file_get_contents('php://input')), true);
 
         $query = "UPDATE calendar SET days = :days WHERE user_id = :user_id AND year = :year";
         $stmt = $connection->prepare($query);
@@ -153,5 +167,33 @@ function updateUserDays($connection) {
         echo json_encode(array('result' => $result));
     } catch (Exception $ex) {
         echo json_encode(array('result' => $ex));
+    }
+}
+
+function createUserDays($connection) {
+    $params = json_decode(trim(file_get_contents('php://input')), true);
+
+    $query = "SELECT id FROM calendar WHERE user_id = :user_id AND year = :year";
+    $stmt = $connection->prepare($query);
+    $stmt->bindParam(':user_id', $params['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':year', $params['year'], PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($result)) {
+        updateUserDays($connection, $params);
+    } else {
+        try {
+            $query = "INSERT INTO calendar (year, days, user_id) VALUES (:year, :days, :user_id)";
+            $stmt = $connection->prepare($query);
+            $stmt->bindParam(':user_id', $params['id'], PDO::PARAM_INT);
+            $stmt->bindParam(':year', $params['year'], PDO::PARAM_INT);
+            $stmt->bindParam(':days', serialize($params['days']), PDO::PARAM_STR);
+            $result = $stmt->execute();
+
+            echo json_encode(array('result' => $result));
+        } catch (Exception $ex) {
+            echo json_encode(array('result' => $ex));
+        }
     }
 }

@@ -3,13 +3,14 @@
 <head>
     <title>Personal Exceptional Dates</title>
     <!--<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.custom.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">-->
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!--<link rel="stylesheet" type="text/css" href="css/layout.css">-->
     <link rel="stylesheet" type="text/css" href="css/colorpicker.css">
     <script type="text/javascript" src="js/angular/angular.min.js"></script>
     <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
-    <!--<script type="text/javascript" src="js/angular/angular-bootstrap.min.js"></script>-->
+    <script type="text/javascript" src="js/angular/bootstrap/ui-bootstrap-custom-0.6.0.min.js"></script>
+    <script type="text/javascript" src="js/angular/bootstrap/ui-bootstrap-custom-tpls-0.6.0.min.js"></script>
     <script type="text/javascript" src="js/jquery/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/jquery/jquery-ui-1.9.2.custom.min.js"></script>
     <script type="text/javascript" src="js/colorpicker/colorpicker.js"></script>
@@ -19,6 +20,10 @@
     <script type="text/javascript" src="js/additions.js"></script>
 </head>
 <body ng-controller="calendarCtrl">
+
+<div result-message=""></div>
+
+<!--<div alert="" type="alert.type">{{alert.msg}}</div>-->
 
 <label for="moc-user">User:</label>
 <input id="moc-user" type="text" value="" ng-model="model.user" auto-complete="">

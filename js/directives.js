@@ -1,7 +1,8 @@
 'use strict';
 
 var appStyleSheet = null,
-    appEditDate = jQuery.Event("appEditDate");
+    appEditDate = jQuery.Event("appEditDate"),
+    timeOut;
 
 app.directive('datePicker',function () {
 
@@ -9,19 +10,9 @@ app.directive('datePicker',function () {
 
         scope.$watch('model.date', function (newValue, oldValue) {
 
-            var newDays = [];
-
-            if (newValue.splice && newValue.length > 0) {
-
-                angular.forEach(newValue, function (value) {
-                    this[value.day] = value.type;
-                }, newDays);
-
-            }
-
             (function ($) {
 
-                var gotThisDate = false, curClass = '', timeLength = newDays.length,
+                var gotThisDate = false, curClass = '', timeLength = newValue.length,
                     curYear = (scope.model.year) ? scope.model.year : (new Date()).getFullYear();
 
                 if ($(element).data('datepicker') != undefined) $(element).datepicker('destroy');
@@ -50,9 +41,9 @@ app.directive('datePicker',function () {
 
                         gotThisDate = date.getTime() / 1000;
 
-                        if (newDays[gotThisDate]) {
+                        if (newValue[gotThisDate]) {
 
-                            curClass = scope.model.date_data.classes[(newDays[gotThisDate] - 1)];
+                            curClass = scope.model.date_data.classes[(newValue[gotThisDate] - 1)];
 
                             return [true, curClass];
                         }
@@ -62,8 +53,6 @@ app.directive('datePicker',function () {
                     onSelect: function (date, inst) {
 
                         gotThisDate = (new Date(date)).getTime() / 1000;
-
-                        newDays[gotThisDate] = Number(scope.model.date_type);
 
                         ++timeLength;
 
@@ -78,32 +67,28 @@ app.directive('datePicker',function () {
     }
 
 }).directive('autoComplete',function () {
-        return {
-            restrict: 'A',
-            require: 'ngModel',
-            link: function (scope, element, attrs, ngModelCtrl) {
+        return function (scope, element, attr) {
 
-                (function ($) {
-                    $(element).autocomplete({
-                        source: '/back/',
-                        minLength: 2,
-                        search: function () {
-                            //$('#' + fieldId).addClass('ajax-loading');
-                        },
-                        response: function () {
-                            //$('#' + fieldId).removeClass('ajax-loading');
-                        }
-                    }).on('autocompleteselect', function (event, ui) {
+            (function ($) {
+                $(element).autocomplete({
+                    source: '/back/',
+                    minLength: 2,
+                    search: function () {
+                        scope.startLoading();
+                    },
+                    response: function () {
+                        scope.endLoading();
+                    }
+                }).on('autocompleteselect', function (event, ui) {
 
-                            scope.getUserDays(ui.item.id, true);
+                        scope.getUserDays(ui.item.id, true);
 
-                        });
-                })(jQuery);
+                    });
+            })(jQuery);
 
-            }
         }
     }).directive('dateSelect',function ($compile) {
-        return function (scope, element, attrs) {
+        return function (scope, element, attr) {
 
             scope.$watch('model.date_data', function (newValue, oldValue) {
 
@@ -246,7 +231,7 @@ app.directive('datePicker',function () {
 
             })(jQuery);
         };
-    }).directive('updateDateType', function (DIRTY_CLASS, PRISTINE_CLASS) {
+    }).directive('updateDateType',function (DIRTY_CLASS, PRISTINE_CLASS) {
         return function (scope, element, attr) {
 
             (function ($) {
@@ -263,5 +248,29 @@ app.directive('datePicker',function () {
                 });
 
             })(jQuery);
+        };
+    }).directive('resultMessage', function () {
+        return function (scope, element, attr) {
+
+            scope.$watch('model.success', function (newValue, oldValue) {
+
+                if (newValue == null) return;
+
+                (function ($) {
+                    clearTimeout(timeOut);
+
+                    if (scope.model.success) {
+                        $(element).html('Success').removeClass('moc-error').addClass('moc-success').fadeIn();
+                    } else {
+                        $(element).html('Error').removeClass('moc-success').addClass('moc-error').fadeIn();
+                    }
+
+                    timeOut = setTimeout(function () {
+                        $(element).fadeOut();
+                    }, 3000);
+
+                })(jQuery);
+
+            });
         };
     });

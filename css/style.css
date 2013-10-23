@@ -38,3 +38,29 @@
     top: 50%;
     width: 100px;
 }
+
+.moc-success {
+    background: none repeat scroll 0 0 rgba(23, 123, 34, 0.698);
+    border: 1px solid #008000;
+    border-radius: 4px 4px 4px 4px;
+    height: 21px;
+    padding: 5px;
+    position: absolute;
+    right: 10px;
+    text-align: center;
+    top: 10px;
+    width: 100px;
+}
+
+.moc-error {
+    background: none repeat scroll 0 0 rgba(235, 29, 39, 0.698);
+    border: 1px solid #008000;
+    border-radius: 4px 4px 4px 4px;
+    height: 21px;
+    padding: 5px;
+    position: absolute;
+    right: 10px;
+    text-align: center;
+    top: 10px;
+    width: 100px;
+}
