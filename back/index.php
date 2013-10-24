@@ -69,7 +69,8 @@ switch ($method) {
         break;
 }
 
-function getUserById($connection) {
+function getUserById($connection)
+{
     $term = $_GET['term'] . '%';
 
     $query = "SELECT id, fullname FROM users WHERE fullname LIKE :name";
@@ -93,7 +94,8 @@ function getUserById($connection) {
     echo json_encode($json);
 }
 
-function getUserDays($connection, $user_id, $year) {
+function getUserDays($connection, $user_id, $year)
+{
     $query = "SELECT days FROM calendar WHERE user_id = :user_id AND year = :year";
     $stmt = $connection->prepare($query);
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -113,7 +115,8 @@ function getUserDays($connection, $user_id, $year) {
     echo json_encode($json);
 }
 
-function getDays($connection) {
+function getDays($connection)
+{
     $query = "SELECT * FROM days WHERE 1";
     $stmt = $connection->prepare($query);
     $stmt->execute();
@@ -135,7 +138,8 @@ function getDays($connection) {
     echo json_encode(array('days' => $json));
 }
 
-function updateDays($connection) {
+function updateDays($connection)
+{
     try {
         $params = json_decode(trim(file_get_contents('php://input')), true);
 
@@ -152,7 +156,8 @@ function updateDays($connection) {
     }
 }
 
-function updateUserDays($connection, $params = false) {
+function updateUserDays($connection, $params = false)
+{
     try {
         if (!$params)
             $params = json_decode(trim(file_get_contents('php://input')), true);
@@ -170,7 +175,8 @@ function updateUserDays($connection, $params = false) {
     }
 }
 
-function createUserDays($connection) {
+function createUserDays($connection)
+{
     $params = json_decode(trim(file_get_contents('php://input')), true);
 
     $query = "SELECT id FROM calendar WHERE user_id = :user_id AND year = :year";

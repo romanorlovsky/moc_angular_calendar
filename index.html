@@ -3,7 +3,7 @@
 <head>
     <title>Personal Exceptional Dates</title>
     <!--<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.custom.css">-->
-    <!--<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">-->
+    <link rel="stylesheet" type="text/css" href="http://getbootstrap.com/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.9.2.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/colorpicker.css">
@@ -26,11 +26,11 @@
 <!--<div alert="" type="alert.type">{{alert.msg}}</div>-->
 
 <label for="moc-user">User:</label>
-<input id="moc-user" type="text" value="" ng-model="model.user" auto-complete="">
+<input id="moc-user" class="form-control" type="text" value="" ng-model="model.user" auto-complete="">
 
 <div date-select=""></div>
 
-<form><input type="button" ng-disabled="!model.add_date" ng-click="saveUserDate()" value="Save"></form>
+<form><button type="button" class="btn btn-success" ng-disabled="!model.add_date" ng-click="saveUserDate()">Save</button></form>
 <div ng-model="model.days" date-picker=""></div>
 
 <div class="overlay" ng-show="model.loading">Loading...</div>

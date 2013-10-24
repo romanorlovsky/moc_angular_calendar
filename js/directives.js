@@ -95,9 +95,12 @@ app.directive('datePicker',function () {
                 if (!newValue.classes) return;
                 if (oldValue.classes) return;
 
-                var list = '<label for="moc-days-list">Reason: </label><select id="moc-days-list" ng-model="model.date_type" dropdown-toggle="">',
+                var list = '<label for="moc-days-list">Reason: </label><select id="moc-days-list" ng-model="model.date_type">',
                     style = '<style type="text/css" id="moc-style">',
                     block = '<ul id="moc-days-block">',//<a id="moc-days-block-toggle" data-show="">Show</a>
+                    boot = '<div class="btn-group">' +
+                        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Reason <span class="caret"></span></button>' +
+                        '<ul class="dropdown-menu"><li ng-repeat="type in types" data-value="{{type.id}}"><a>{{type.title}}</a></li></ul></div>',
                     itemName = '';
 
                 scope.types = {};
@@ -106,7 +109,7 @@ app.directive('datePicker',function () {
 
                     itemName = value.id + 'item';
 
-                    scope.types[itemName] = {id: value.id, title: value.title, color: value.color};
+                    scope.types[itemName] = {id: value.id, title: value.title, color: value.color, iname: itemName};
 
                     list += '<option value="' + value.id + '">{{types.' + itemName + '.title}}</option>';
                     style += appClassTemplate(itemName, value.color, false);
@@ -115,9 +118,10 @@ app.directive('datePicker',function () {
                         '<div edit-date-type="" name="' + itemName + '_color" ng-model="types.' + itemName + '.color" style="background-color: #' + value.color + ';"></div>' +
                         '</div>' +
                         '<span class=""> - {{types.' + itemName + '.title}}</span>' +
-                        '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title" required>' +
-                        '<input type="button" update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine" value="Save">' +
-                        '<input type="button" cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine" value="Cancel"></form></li>';
+                        '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title form-control" required>' +
+                        '<button type="button" class="btn btn-primary">Edit</button>' +
+                        '<button type="button" class="btn btn-success" update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Save</button>' +
+                        '<button type="button" class="btn btn-warning" cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button></form></li>';
                 });
 
                 list += '</select>';
@@ -126,7 +130,7 @@ app.directive('datePicker',function () {
 
                 block += '</ul>';
 
-                element.html(list + block);
+                element.html(list + block+boot);
 
                 $compile(element.contents())(scope);
 
