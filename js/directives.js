@@ -100,28 +100,40 @@ app.directive('datePicker',function () {
                     block = '<ul id="moc-days-block">',//<a id="moc-days-block-toggle" data-show="">Show</a>
                     boot = '<div class="btn-group">' +
                         '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Reason <span class="caret"></span></button>' +
-                        '<ul class="dropdown-menu"><li ng-repeat="type in types" data-value="{{type.id}}"><a>{{type.title}}</a></li></ul></div>',
+                        '<ul class="dropdown-menu"><li ng-repeat="type in types" data-value="{{type.id}}"><a>{{type.title}}</a></li></ul></div>', /* +
+                 '<ul><li ng-repeat="type in types"><form name="moc_days_form_{{type.name}}" id="moc_days_form_{{type.name}}" class="moc_days_forms">' +
+                 '<div id="moc-colorpicker-{{type.name}}" class="moc-colorpicker-block" data-color="{{type.color}}" data-item="{{type.id}}">' +
+                 '<div edit-date-type="" name="{{type.name}}_color" ng-model="types.{{type.name}}.color" style="background-color: #{{type.color}};"></div>' +
+                 '</div>' +
+                 '<span class="" ng-show="!types.{{type.name}}.edit"> - </span>' +
+                 '<input type="text" ng-show="types.{{type.name}}.edit" data-title="{{type.title}}" ng-model="types.{{type.name}}.title" name="{{type.name}}_title" class="moc-edit-title form-control" required>' +
+                 '<button type="button" class="btn btn-primary" edit-date-title="{{type.name}}">Edit</button>' +
+                 '<button type="button" class="btn btn-success" update-date-type="{{type.name}}" ng-disabled="moc_days_form_{{type.name}}.$pristine">Save</button>' +
+                 '<button type="button" class="btn btn-warning" cancel-date-type="{{type.name}}" ng-model="types.{{type.name}}" ng-disabled="moc_days_form_{{type.name}}.$pristine">Cancel</button></form></li></ul>',*/
                     itemName = '';
 
                 scope.types = {};
 
                 angular.forEach(newValue.options, function (value) {
 
-                    itemName = value.id + 'item';
+                    itemName = 'item' + value.id;
 
-                    scope.types[itemName] = {id: value.id, title: value.title, color: value.color, iname: itemName};
+                    scope.types[itemName] = {id: value.id, title: value.title, color: value.color, name: itemName, edit: false};
 
                     list += '<option value="' + value.id + '">{{types.' + itemName + '.title}}</option>';
                     style += appClassTemplate(itemName, value.color, false);
                     block += '<li><form name="moc_days_form_' + itemName + '" id="moc_days_form_' + itemName + '" class="moc_days_forms">' +
+                        '<div class="moc-type-item">' +
                         '<div id="moc-colorpicker-' + itemName + '" class="moc-colorpicker-block" data-color="' + value.color + '" data-item="' + value.id + '">' +
                         '<div edit-date-type="" name="' + itemName + '_color" ng-model="types.' + itemName + '.color" style="background-color: #' + value.color + ';"></div>' +
                         '</div>' +
-                        '<span class=""> - {{types.' + itemName + '.title}}</span>' +
-                        '<input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title form-control" required>' +
-                        '<button type="button" class="btn btn-primary">Edit</button>' +
+                        '<span class="" ng-show="!types.' + itemName + '.edit"> - {{types.' + itemName + '.title}}</span></div>' +
+                        '<div class="col-md-2" ng-show="types.' + itemName + '.edit"><input type="text" data-title="' + value.title + '" ng-model="types.' + itemName + '.title" name="' + itemName + '_title" class="moc-edit-title form-control" required></div>' +
+                        '<div class="moc-types-buttons">' +
+                        '<button type="button" class="btn btn-primary" edit-date-title="' + itemName + '">Edit</button>' +
                         '<button type="button" class="btn btn-success" update-date-type="' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Save</button>' +
-                        '<button type="button" class="btn btn-warning" cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button></form></li>';
+                        '<button type="button" class="btn btn-warning" cancel-date-type="' + itemName + '" ng-model="types.' + itemName + '" ng-disabled="moc_days_form_' + itemName + '.$pristine">Cancel</button>' +
+                        '</div></form></li>';
                 });
 
                 list += '</select>';
@@ -130,7 +142,7 @@ app.directive('datePicker',function () {
 
                 block += '</ul>';
 
-                element.html(list + block+boot);
+                element.html(list + block + boot);
 
                 $compile(element.contents())(scope);
 
@@ -235,6 +247,15 @@ app.directive('datePicker',function () {
 
             })(jQuery);
         };
+    }).directive('editDateTitle',function () {
+        return function (scope, element, attr) {
+
+            element.bind('click', function () {
+
+                scope.editDateTitle(attr.editDateTitle);
+
+            });
+        };
     }).directive('updateDateType',function (DIRTY_CLASS, PRISTINE_CLASS) {
         return function (scope, element, attr) {
 
@@ -248,6 +269,10 @@ app.directive('datePicker',function () {
                     $('input.moc-edit-title', parent).removeClass(DIRTY_CLASS).addClass(PRISTINE_CLASS).data('title', scope.types[attr.updateDateType].title);
 
                     scope.saveDateType(attr.updateDateType);
+
+                    if (scope.types[attr.updateDateType].edit) {
+                        scope.editDateTitle(attr.updateDateType);
+                    }
 
                 });
 
@@ -264,9 +289,13 @@ app.directive('datePicker',function () {
                     clearTimeout(timeOut);
 
                     if (scope.model.success) {
+
                         $(element).html('Success').removeClass('moc-error').addClass('moc-success').fadeIn();
+
                     } else {
+
                         $(element).html('Error').removeClass('moc-success').addClass('moc-error').fadeIn();
+
                     }
 
                     timeOut = setTimeout(function () {

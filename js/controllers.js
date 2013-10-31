@@ -29,7 +29,7 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         angular.forEach(data.days, function (value) {
 
-            classes.push('moc-calendar-' + (value.id + 'item'));
+            classes.push('moc-calendar-' + ( 'item' + value.id));
             options.push({id: value.id, title: value.title, color: value.color});
 
         });
@@ -83,7 +83,7 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
             var current = $scope.model.date[date];
 
-            if(current && !($scope.model.date_type != current)) {
+            if (current && !($scope.model.date_type != current)) {
                 delete $scope.model.date[date];
             }
             else {
@@ -180,6 +180,12 @@ app.controller('calendarCtrl', function ($scope, Days, DataCache, UserDays) {
 
         $scope.resetFormItem($scope['moc_days_form_' + item][item + '_title'], inController);
 
+    };
+
+    $scope.editDateTitle = function (item) {
+        $scope.$apply(function () {
+            $scope.types[item].edit = !$scope.types[item].edit;
+        });
     };
 
     $scope.saveDateType = function (item) {

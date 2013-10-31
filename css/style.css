@@ -64,3 +64,11 @@
     top: 10px;
     width: 100px;
 }
+
+.moc-type-item {
+    float: left;
+}
+
+#moc-days-block > li {
+    clear: both;
+}
